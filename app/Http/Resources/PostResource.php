@@ -36,7 +36,7 @@ class PostResource extends JsonResource
         return [
             'success'   => $this->status,
             'message'   => $this->message,
-            'data'      => $this->resource
+            'posts'      => $this->resource
         ];
     }
 }

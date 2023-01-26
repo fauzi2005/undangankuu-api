@@ -19,10 +19,17 @@ class PostController extends Controller
     public function index()
     {
         //get posts
-        $posts = Post::latest()->paginate(5);
+        $posts = Post::all();
 
         //return collection of posts as a resource
-        return new PostResource(true, 'List Data Posts', $posts);
+
+        return response()->json([
+            // "success" => true,
+            // "message" => "Product List",
+            "posts" => $posts
+            ]);
+
+        // return new PostResource(true, 'List Data Posts', $posts);
     }
 
     /**
@@ -54,7 +61,8 @@ class PostController extends Controller
             'image'     => $image->hashName(),
             'title'     => $request->title,
             'content'   => $request->content,
-            'read'      => FALSE
+            'read'      => FALSE,
+            'id_post'        => substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 6)
         ]);
 
         //return response
@@ -67,10 +75,23 @@ class PostController extends Controller
      * @param  mixed $post
      * @return void
      */
-    public function show(Post $post)
+    public function show($id)
     {
         //return single post as a resource
-        return new PostResource(true, 'Data Post Ditemukan!', $post);
+        // return new PostResource(true, 'Data Post Ditemukan!', $post);
+
+        $post = Post::firstWhere('id_post',$id);
+
+
+        if (is_null($post)) {
+            return response()->json('Data not found', 422);
+        } else {
+            return response()->json([
+                // "success" => true,
+                // "message" => "Product List",
+                "posts" => $post
+            ]);
+        }
     }
 
     /**
@@ -131,15 +152,27 @@ class PostController extends Controller
      * @param  mixed $post
      * @return void
      */
-    public function destroy(Post $post)
+    public function destroy($param)
     {
+        // $post = Post::all();
         //delete image
-        Storage::delete('public/posts/'.$post->image);
+        /// Storage::delete('public/posts/'.$post->image);
 
         //delete post
-        $post->delete();
+        ///$post->delete();
+        // $post = Post::find($id);
 
         //return response
-        return new PostResource(true, 'Data Post Berhasil Dihapus!', null);
+        ///return new PostResource(true, 'Data Post Berhasil Dihapus!', null);
+
+        $post = Post::findOrFail($param);
+
+        if($post) {
+            Storage::delete('public/posts/'.$post->image);
+            $post->delete(); 
+            return response()->json("Data berhasil dihapus", 200);
+        } else {
+            return response()->json("Data tidak ditemukan", 422);
+        }
     }
 }

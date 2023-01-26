@@ -19,4 +19,9 @@ use Illuminate\Support\Facades\Route;
 // });
 
 //posts
-Route::apiResource('/posts', App\Http\Controllers\Api\PostController::class);
+// Route::apiResource('/posts', App\Http\Controllers\Api\PostController::class);
+
+Route::get('/posts', [App\Http\Controllers\Api\PostController::class, 'index']);
+Route::get('/posts/{param}', [App\Http\Controllers\Api\PostController::class, 'show']);
+Route::delete('/posts/{param}', [App\Http\Controllers\Api\PostController::class, 'destroy']);
+Route::post('/posts', [App\Http\Controllers\Api\PostController::class, 'store']);
