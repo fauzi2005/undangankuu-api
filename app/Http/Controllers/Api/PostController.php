@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PostResource;
@@ -14,20 +15,16 @@ class PostController extends Controller
     /**
      * index
      *
-     * @return void
+     * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
         //get posts
         $posts = Post::all();
 
         //return collection of posts as a resource
 
-        return response()->json([
-            // "success" => true,
-            // "message" => "Product List",
-            "posts" => $posts
-            ]);
+        return response()->json(["posts" => $posts]);
 
         // return new PostResource(true, 'List Data Posts', $posts);
     }
@@ -36,9 +33,9 @@ class PostController extends Controller
      * store
      *
      * @param  mixed $request
-     * @return void
+     * @return PostResource|JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): PostResource|JsonResponse
     {
         //define validation rules
         $validator = Validator::make($request->all(), [
@@ -62,36 +59,40 @@ class PostController extends Controller
             'title'     => $request->title,
             'content'   => $request->content,
             'read'      => FALSE,
-            'id_post'        => substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 6)
+            'id_post'        => substr(base_convert(sha1(uniqid(mt_rand(), true)), 16, 36), 0, 6)
         ]);
 
         //return response
-        return new PostResource(true, 'Data Post Berhasil Ditambahkan!', $post);
+//        return new PostResource(true, 'Data Post Berhasil Ditambahkan!', $post);
+        return response()->json(["posts" => $post]);
     }
 
     /**
      * show
      *
-     * @param  mixed $post
-     * @return void
+     * @param $id
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        //return single post as a resource
-        // return new PostResource(true, 'Data Post Ditemukan!', $post);
-
-        $post = Post::firstWhere('id_post',$id);
 
 
-        if (is_null($post)) {
-            return response()->json('Data not found', 422);
-        } else {
-            return response()->json([
-                // "success" => true,
-                // "message" => "Product List",
-                "posts" => $post
-            ]);
+        try {
+            $post = Post::firstWhere('id_post',$id);
+
+            if (is_null($post)) {
+                return response()->json([
+                    'error' => 'The requested resource could not be found.'
+                ], 404);
+            }
+
+            return response()->json($post);
+        } catch (e) {
+            print(e);
+            return e;
         }
+
+
     }
 
     /**
@@ -99,9 +100,9 @@ class PostController extends Controller
      *
      * @param  mixed $request
      * @param  mixed $post
-     * @return void
+     * @return JsonResponse|PostResource
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, Post $post): PostResource|JsonResponse
     {
         //define validation rules
         $validator = Validator::make($request->all(), [
@@ -149,10 +150,10 @@ class PostController extends Controller
     /**
      * destroy
      *
-     * @param  mixed $post
-     * @return void
+     * @param $param
+     * @return JsonResponse
      */
-    public function destroy($param)
+    public function destroy($param): JsonResponse
     {
         // $post = Post::all();
         //delete image
@@ -169,10 +170,10 @@ class PostController extends Controller
 
         if($post) {
             Storage::delete('public/posts/'.$post->image);
-            $post->delete(); 
-            return response()->json("Data berhasil dihapus", 200);
-        } else {
-            return response()->json("Data tidak ditemukan", 422);
+            $post->delete();
+            return response()->json("Data berhasil dihapus");
         }
+
+        return response()->json("Data tidak ditemukan", 422);
     }
 }
