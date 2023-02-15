@@ -80,11 +80,11 @@ class PostController extends Controller
         try {
             $post = Post::firstWhere('id_post',$id);
 
-            if (is_null($post)) {
+            /*if (is_null($post)) {
                 return response()->json([
                     'error' => 'The requested resource could not be found.'
                 ], 404);
-            }
+            }*/
 
             return response()->json($post);
         } catch (e) {
@@ -102,9 +102,16 @@ class PostController extends Controller
      * @param  mixed $post
      * @return JsonResponse|PostResource
      */
-    public function update(Request $request, Post $post): PostResource|JsonResponse
+    public function update($id): PostResource|JsonResponse
     {
-        //define validation rules
+        $posts = Post::firstWhere('id_post',$id);
+
+        $posts->update([
+            'read'      => TRUE,
+        ]);
+
+        return response()->json($posts);
+        /*//define validation rules
         $validator = Validator::make($request->all(), [
             'title'     => 'required',
             'content'   => 'required',
@@ -144,7 +151,7 @@ class PostController extends Controller
         }
 
         //return response
-        return new PostResource(true, 'Data Post Berhasil Diubah!', $post);
+        return new PostResource(true, 'Data Post Berhasil Diubah!', $post);*/
     }
 
     /**

@@ -25,5 +25,6 @@ Route::get('/posts', [App\Http\Controllers\Api\PostController::class, 'index']);
 Route::get('/posts/{param}', [App\Http\Controllers\Api\PostController::class, 'show']);
 Route::delete('/posts/{param}', [App\Http\Controllers\Api\PostController::class, 'destroy']);
 Route::post('/posts', [App\Http\Controllers\Api\PostController::class, 'store']);
+Route::put('/posts/{param}', [App\Http\Controllers\Api\PostController::class, 'update']);
 
 Route::get('/', [App\Http\Controllers\Controller::class, 'checkConnection']);
