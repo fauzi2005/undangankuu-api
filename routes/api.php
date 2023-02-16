@@ -28,3 +28,7 @@ Route::post('/posts', [App\Http\Controllers\Api\PostController::class, 'store'])
 Route::put('/posts/{param}', [App\Http\Controllers\Api\PostController::class, 'update']);
 
 Route::get('/', [App\Http\Controllers\Controller::class, 'checkConnection']);
+
+Route::get('/guest-books', [App\Http\Controllers\Api\GuestBookController::class, 'index']);
+Route::post('/guest-books', [App\Http\Controllers\Api\GuestBookController::class, 'store']);
+Route::put('/guest-books/{param}', [App\Http\Controllers\Api\GuestBookController::class, 'update']);

@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Models\GuestBook;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\GuestBookResource;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Ramsey\Uuid\Uuid;
+
+class GuestBookController extends Controller
+{
+//    public function rawSql(Request $request)
+//    {
+//        $name = $request->input('name');
+//        $email = $request->input('email');
+//        $created_at = now();
+//        $updated_at = now();
+//
+//        DB::insert('insert into users (name, email, created_at, updated_at) values (?, ?, ?, ?)', [$name, $email, $created_at, $updated_at]);
+//
+//        return redirect('/users');
+//    }
+
+
+    public function index(): JsonResponse
+    {
+        $guestBook = GuestBook::all();
+
+        return response()->json(["guestBooks" => $guestBook]);
+    }
+
+    public function store(Request $request) : JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name'     => 'required'
+        ]);
+
+        //check if validation fails
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $uuid = Uuid::uuid4()->toString();
+
+        $guestBook = GuestBook::create([
+            'uuid'  => $uuid,
+            'name' => $request->name
+        ]);
+
+        return response()->json(["guestBooks" => $guestBook]);
+    }
+
+    public function update($id) : JsonResponse
+    {
+        $guestBook = GuestBook::firstWhere('uuid', $id);
+
+        $guestBook->alreadyAttend = true;
+        $guestBook->typeForm = 'RSVP';
+
+        // Set the timezone to Jakarta
+//        Carbon::setTimezone('Asia/Jakarta');
+
+        $guestBook->touch();
+
+        return response()->json($guestBook);
+    }
+}
