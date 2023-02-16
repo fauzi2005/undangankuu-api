@@ -32,3 +32,4 @@ Route::get('/', [App\Http\Controllers\Controller::class, 'checkConnection']);
 Route::get('/guest-books', [App\Http\Controllers\Api\GuestBookController::class, 'index']);
 Route::post('/guest-books', [App\Http\Controllers\Api\GuestBookController::class, 'store']);
 Route::put('/guest-books/{param}', [App\Http\Controllers\Api\GuestBookController::class, 'update']);
+Route::get('/guest-books/{param}', [App\Http\Controllers\Api\GuestBookController::class, 'show']);

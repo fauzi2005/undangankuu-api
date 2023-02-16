@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Models\GuestBook;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GuestBookResource;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -53,18 +52,31 @@ class GuestBookController extends Controller
             'name' => $request->name
         ]);
 
-        return response()->json(["guestBooks" => $guestBook]);
+        return response()->json(["guestBooks" => $guestBook], 201);
+    }
+
+    public function show($id) : JsonResponse
+    {
+        $guestBook = GuestBook::firstWhere('uuid', $id);
+
+        return response()->json($guestBook);
     }
 
     public function update($id) : JsonResponse
     {
         $guestBook = GuestBook::firstWhere('uuid', $id);
 
+        if ($guestBook->alreadyAttend) {
+            // The alreadyAttend field is true, do something here
+            return response()->json(['message' => 'Already attended.', 'alreadyAttend' => $guestBook->alreadyAttend], 200);
+        }
+
         $guestBook->alreadyAttend = true;
         $guestBook->typeForm = 'RSVP';
 
         // Set the timezone to Jakarta
-//        Carbon::setTimezone('Asia/Jakarta');
+        // Carbon::setTimezone('Asia/Jakarta');
+
 
         $guestBook->touch();
 
