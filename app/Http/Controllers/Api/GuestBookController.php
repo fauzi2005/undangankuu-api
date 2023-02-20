@@ -76,7 +76,7 @@ class GuestBookController extends Controller
 
             $results = Carbon::parse($updatedAt)->format('Y-m-d\TH:i:s.u\Z');
             // The alreadyAttend field is true, do something here
-            return response()->json(['message' => 'Already attended.', 'alreadyAttend' => $guestBook->alreadyAttend, 'updatedAt' => $results], 200);
+            return response()->json(['message' => 'Already attended.', 'alreadyAttend' => true, 'updatedAt' => $results], 200);
         }
 
         $guestBook->alreadyAttend = true;
